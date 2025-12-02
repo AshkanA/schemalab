@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>SchemaLab – Tools voor het Gemeentelijk Gegevensmodel (GGM)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg-color: #f5f7fb;
+      --card-bg: #ffffff;
+      --accent: #1664d8;
+      --accent-soft: #e3edff;
+      --text-main: #1f2933;
+      --text-muted: #6b7a8c;
+      --border-radius: 14px;
+      --shadow-soft: 0 12px 30px rgba(15, 35, 95, 0.08);
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #e9f0ff 0, #f5f7fb 45%, #f5f7fb 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 980px;
+      margin: 32px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(22, 100, 216, 0.12);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #1664d8, #47a3ff);
+      box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
+    }
+
+    h1 {
+      font-size: 30px;
+      font-weight: 650;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    main {
+      margin-top: 24px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        margin: 20px 12px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 20px 20px 18px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(15, 35, 95, 0.05);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      transition: transform var(--transition-fast), 
+                  box-shadow var(--transition-fast), 
+                  border-color var(--transition-fast), 
+                  background-color var(--transition-fast);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(22, 100, 216, 0.08), transparent 55%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      z-index: -1;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(15, 35, 95, 0.16);
+      border-color: rgba(22, 100, 216, 0.28);
+      background-color: #ffffff;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .badge {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(22, 100, 216, 0.3);
+      white-space: nowrap;
+    }
+
+    .card-body {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin-bottom: 14px;
+    }
+
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f2f5fb;
+    }
+
+    .meta-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #9fb4ff;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 6px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--accent);
+      color: #ffffff;
+      cursor: pointer;
+      transition: background-color var(--transition-fast), 
+                  transform var(--transition-fast), 
+                  box-shadow var(--transition-fast);
+      box-shadow: 0 8px 18px rgba(22, 100, 216, 0.28);
+      white-space: nowrap;
+    }
+
+    .button span.arrow {
+      font-size: 14px;
+      transform: translateX(0);
+      transition: transform var(--transition-fast);
+    }
+
+    .card:hover .button {
+      background-color: #124eaa;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(15, 35, 95, 0.35);
+    }
+
+    .card:hover .button span.arrow {
+      transform: translateX(2px);
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo-pill">
+        <div class="logo-dot"></div>
+        <span>SchemaLab</span>
+      </div>
+      <h1>Tools gegevensmodellen</h1>
+      <p class="subtitle">
+        SchemaLab helpt je om Enterprise Architect-modellen bruikbaar te maken buiten EA zelf: 
+        van DDL-generatie tot modelvalidatie en kwaliteitschecks.
+      </p>
+    </header>
+
+    <main>
+      <div class="cards">
+
+        <!-- DDL Generator -->
+        <a class="card-link" href="https://ggm-generator.schemalab.app">
+          <article class="card">
+            <div class="card-header">
+              <h2 class="card-title">DDL Generator</h2>
+              <div class="badge">Generator</div>
+            </div>
+            <p class="card-body">
+              Genereer automatisch SQL DDL, dbdiagram.io, PlantUML en RDF/Turtle vanuit je 
+              Enterprise Architect-modellen. Geschikt voor het Gemeentelijk Gegevensmodel 
+              en andere domeinmodellen.
+            </p>
+            <div class="meta">
+              <div class="meta-item">
+                <span class="meta-dot"></span>
+                <span>Enterprise Architect → DDL</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-dot"></span>
+                <span>dbdiagram &amp; visualisatie</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="button">
+                <span>Naar generator</span>
+                <span class="arrow">↗</span>
+              </div>
+              <span class="hint">Opent in een nieuwe omgeving</span>
+            </div>
+          </article>
+        </a>
+
+        <!-- Model Validator -->
+        <a class="card-link" href="https://ggm-validator.schemalab.app">
+          <article class="card">
+            <div class="card-header">
+              <h2 class="card-title">Model Validator</h2>
+              <div class="badge">Validator</div>
+            </div>
+            <p class="card-body">
+              Controleer je model op structuur, semantiek en consistentie. 
+              Signaleert onder andere ontbrekende attributen, losse objecten en 
+              dubieuze datatypen, met een HTML-dashboard voor snelle analyse.
+            </p>
+            <div class="meta">
+              <div class="meta-item">
+                <span class="meta-dot"></span>
+                <span>Kwaliteit &amp; consistentie</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-dot"></span>
+                <span>HTML-rapportage</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="button">
+                <span>Naar validator</span>
+                <span class="arrow">↗</span>
+              </div>
+              <span class="hint">Opent in een nieuwe omgeving</span>
+            </div>
+          </article>
+        </a>
+
+      </div>
+    </main>
+
+    <footer>
+      © 2025 SchemaLab — Tooling voor gegevensmodellen
+    </footer>
+  </div>
+</body>
+</html>
