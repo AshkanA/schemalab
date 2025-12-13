@@ -68,7 +68,27 @@
       border-radius: 999px;
       background: linear-gradient(135deg, #1664d8, #47a3ff);
       box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
+      animation: pulse 2.2s ease-in-out infinite;
+
     }
+
+
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
+        }
+        50% {
+          transform: scale(1.12);
+          box-shadow: 0 0 0 6px rgba(22, 100, 216, 0.08);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
+        }
+      }
+
 
     h1 {
       font-size: 30px;
@@ -294,7 +314,7 @@
               <div class="badge">Generator</div>
             </div>
             <p class="card-body">
-              Genereer automatisch SQL DDL, dbdiagram.io, PlantUML en RDF/Turtle vanuit je 
+              Genereer automatisch database schema's zoals SQL DDL, dbdiagram.io, PlantUML en RDF/Turtle vanuit je 
               Enterprise Architect-modellen. Geschikt voor het Gemeentelijk Gegevensmodel 
               en andere domeinmodellen.
             </p>
@@ -305,7 +325,11 @@
               </div>
               <div class="meta-item">
                 <span class="meta-dot"></span>
-                <span>dbdiagram &amp; visualisatie</span>
+                <span>visualisaties</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-dot"></span>
+                <span>Linked Data</span>
               </div>
             </div>
             <div class="card-footer">
@@ -326,18 +350,19 @@
               <div class="badge">Validator</div>
             </div>
             <p class="card-body">
-              Controleer je model op structuur, semantiek en consistentie. 
-              Signaleert onder andere ontbrekende attributen, losse objecten en 
-              dubieuze datatypen, met een HTML-dashboard voor snelle analyse.
+              Controleer je model op structuur, semantiek en consistentie.
+              Met expliciete datakwaliteitsregels wordt de kwaliteit van het model
+              systematisch gemeten en inzichtelijk gemaakt in een overzichtelijk
+              HTML-dashboard.
             </p>
             <div class="meta">
               <div class="meta-item">
                 <span class="meta-dot"></span>
-                <span>Kwaliteit &amp; consistentie</span>
+                <span>Data Kwaliteit</span>
               </div>
               <div class="meta-item">
                 <span class="meta-dot"></span>
-                <span>HTML-rapportage</span>
+                <span>Dynamische rapportage</span>
               </div>
             </div>
             <div class="card-footer">
@@ -353,9 +378,10 @@
       </div>
     </main>
 
-    <footer>
-      © 2025 SchemaLab — Tooling voor gegevensmodellen
-    </footer>
+<footer>
+  © 2025 SchemaLab — Tooling voor gegevensmodellen · by Ashkan Ashkpour
+</footer>
+
   </div>
 </body>
 </html>
