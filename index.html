@@ -71,23 +71,20 @@
       animation: pulse 2.2s ease-in-out infinite;
     }
 
-
-
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-          box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
-        }
-        50% {
-          transform: scale(1.12);
-          box-shadow: 0 0 0 6px rgba(22, 100, 216, 0.08);
-        }
-        100% {
-          transform: scale(1);
-          box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
-        }
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
       }
-
+      50% {
+        transform: scale(1.12);
+        box-shadow: 0 0 0 6px rgba(22, 100, 216, 0.08);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
+      }
+    }
 
     h1 {
       font-size: 30px;
@@ -328,7 +325,7 @@
               </div>
               <div class="meta-item">
                 <span class="meta-dot"></span>
-                <span>Linked Data</span>
+                <span>Linked Open Data</span>
               </div>
             </div>
             <div class="card-footer">
@@ -349,10 +346,8 @@
               <div class="badge">Validator</div>
             </div>
             <p class="card-body">
-              Controleer je model op structuur, semantiek en consistentie.
-              Met expliciete datakwaliteitsregels wordt de kwaliteit van het model
-              systematisch gemeten en inzichtelijk gemaakt in een overzichtelijk
-              dashboard.
+              Systematische kwaliteitscontrole van het GGM-model.
+              De applicatie controleert structuur, semantiek en consistentie op basis van expliciete datakwaliteitsregels en presenteert de resultaten in een overzichtelijk dashboard.
             </p>
             <div class="meta">
               <div class="meta-item">
@@ -374,12 +369,44 @@
           </article>
         </a>
 
+        <!-- GGM LOD Browser - Coming Soon (niet klikbaar) -->
+        <article class="card">
+          <div class="card-header">
+            <h2 class="card-title">GGM LOD Browser</h2>
+            <div class="badge">LOD Browser</div>
+          </div>
+          <p class="card-body">
+            Ontdek het Gemeentelijk Gegevensmodel als Linked Open Data in een intuïtieve webinterface. 
+            Blader eenvoudig door domeinen, klassen en relaties – machine-readable én mensvriendelijk.
+          </p>
+          <div class="meta">
+            <div class="meta-item">
+              <span class="meta-dot"></span>
+              <span>Linked Open Data</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-dot"></span>
+              <span>Intuïtieve navigatie</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-dot"></span>
+              <span>RDF</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="button" style="background:#e2e8f0; color:#64748b; box-shadow:none; cursor:default;">
+              <span>Binnenkort beschikbaar</span>
+            </div>
+            <span class="hint">Wordt momenteel ontwikkeld</span>
+          </div>
+        </article>
+
       </div>
     </main>
 
-<footer>
-  © 2025 SchemaLab — Tooling voor gegevensmodellen · by Ashkan Ashkpour
-</footer>
+    <footer>
+      © 2025 SchemaLab — Tooling voor gegevensmodellen · by Ashkan Ashkpour
+    </footer>
 
   </div>
 </body>
