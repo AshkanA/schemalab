@@ -2,426 +2,853 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>SchemaLab – Tooling voor gegevensmodellen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SchemaLab – Tooling voor gegevensmodellen</title>
+  <meta name="description" content="SchemaLab maakt Enterprise Architect-modellen bruikbaar buiten EA zelf: van DDL-generatie tot modelvalidatie en Linked Open Data.">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:title" content="SchemaLab – Tooling voor gegevensmodellen">
+  <meta property="og:description" content="Genereer schema's, bewaak modelkwaliteit en publiceer het Gemeentelijk Gegevensmodel als Linked Open Data.">
+  <meta property="og:url" content="https://schemalab.app/">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://schemalab.app/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!--
+    Design system (UI/UX Pro Max): Dark Mode (OLED) + Parallax Storytelling / Motion-Driven.
+    Type: Inter (Minimal Swiss) + JetBrains Mono. Per-product accent: blue / green / violet.
+  -->
   <style>
     :root {
-      --bg-color: #f5f7fb;
-      --card-bg: #ffffff;
-      --accent: #1664d8;
-      --accent-soft: #e3edff;
-      --text-main: #1f2933;
-      --text-muted: #6b7a8c;
-      --border-radius: 14px;
-      --shadow-soft: 0 12px 30px rgba(15, 35, 95, 0.08);
-      --transition-fast: 0.18s ease-out;
+      --bg: #000000;
+      --bg-elev: #0B0B10;
+      --card: #111118;
+      --card-2: #16161F;
+      --fg: #F5F5F7;
+      --fg-muted: #A1A1AA;
+      --fg-dim: #71717A;
+      --line: rgba(255, 255, 255, .08);
+      --line-strong: rgba(255, 255, 255, .16);
+      --light-bg: #F5F5F7;
+      --light-fg: #1D1D1F;
+      --light-muted: #6E6E73;
+
+      --blue: #3B82F6;
+      --blue-2: #60A5FA;
+      --green: #22C55E;
+      --green-2: #4ADE80;
+      --violet: #A78BFA;
+      --violet-2: #C4B5FD;
+      --cyan: #22D3EE;
+
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --ease: cubic-bezier(.2, .7, .2, 1);
+      --wrap: 1200px;
+      --nav-h: 52px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, #e9f0ff 0, #f5f7fb 45%, #f5f7fb 100%);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
+      margin: 0; background: var(--bg); color: var(--fg);
+      font-family: var(--font); font-size: 17px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, p { margin: 0; }
+    a { color: inherit; }
+    img, svg { display: block; }
+    :focus-visible { outline: 2px solid var(--blue-2); outline-offset: 3px; border-radius: 6px; }
+    .wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+    .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .skip { position: absolute; left: 16px; top: -60px; z-index: 200; background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; text-decoration: none; font-weight: 600; }
+    .skip:focus { top: 10px; }
+
+    /* ---------- Nav ---------- */
+    .nav {
+      position: fixed; inset: 0 0 auto 0; z-index: 100; height: var(--nav-h);
+      background: rgba(0, 0, 0, .55);
+      backdrop-filter: saturate(1.8) blur(20px); -webkit-backdrop-filter: saturate(1.8) blur(20px);
+      border-bottom: 1px solid transparent; transition: border-color .3s var(--ease), background-color .3s var(--ease);
+    }
+    .nav.is-scrolled { border-bottom-color: var(--line); background: rgba(10, 10, 14, .72); }
+    .nav__inner { height: 100%; display: flex; align-items: center; gap: 28px; }
+    .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; letter-spacing: -.01em; margin-right: auto; }
+    .logo__mark { width: 22px; height: 22px; }
+    .nav__links { display: flex; gap: 26px; list-style: none; margin: 0; padding: 0; }
+    .nav__links a { font-size: 13px; color: var(--fg-muted); text-decoration: none; padding: 14px 0; transition: color .2s var(--ease); }
+    .nav__links a:hover { color: var(--fg); }
+    .nav__cta { font-size: 13px; font-weight: 500; text-decoration: none; padding: 7px 14px; border-radius: 999px; background: var(--fg); color: #000; transition: transform .2s var(--ease), background-color .2s var(--ease); }
+    .nav__cta:hover { background: #fff; transform: scale(1.03); }
+    @media (max-width: 760px) { .nav__links { display: none; } }
+
+    /* ---------- Buttons ---------- */
+    .btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 24px; border-radius: 999px; font-weight: 500; font-size: 16px; text-decoration: none; cursor: pointer; transition: transform .25s var(--ease), background-color .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease); }
+    .btn--primary { background: var(--blue); color: #fff; }
+    .btn--primary:hover { background: #2F74E8; transform: translateY(-1px); }
+    .btn--link { color: var(--blue-2); padding: 0 8px; }
+    .btn--link:hover { color: #93C5FD; }
+    .btn--link .chev { transition: transform .25s var(--ease); }
+    .btn--link:hover .chev { transform: translateX(3px); }
+
+    .eyebrow { font-size: 14px; font-weight: 600; letter-spacing: .02em; }
+    .grad-blue { background: linear-gradient(100deg, #93C5FD 0%, #3B82F6 45%, #A78BFA 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .grad-green { background: linear-gradient(100deg, #15803D 0%, #16A34A 50%, #0891B2 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .grad-violet { background: linear-gradient(100deg, #C4B5FD 0%, #A78BFA 40%, #22D3EE 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .grad-white { background: linear-gradient(180deg, #FFFFFF 30%, #A1A1AA 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    /* ---------- Hero (pinned, scroll-scrubbed) ---------- */
+    .hero { position: relative; height: 210vh; }
+    .hero__stage { position: sticky; top: 0; height: 100vh; min-height: 640px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: calc(var(--nav-h) + 9vh); }
+    .hero__glow { position: absolute; inset: auto 50% 0 auto; width: 1400px; height: 900px; transform: translate(50%, 40%); background: radial-gradient(closest-side, rgba(59, 130, 246, .35), rgba(167, 139, 250, .18) 45%, transparent 75%); filter: blur(10px); pointer-events: none; opacity: calc(.6 + var(--p, 0) * .4); }
+    .hero__grid-bg { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 64px 64px; mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 20%, transparent 75%); opacity: .5; pointer-events: none; }
+    .hero__copy { position: relative; text-align: center; padding: 0 24px; opacity: calc(1 - var(--p, 0) * 1.8); transform: translateY(calc(var(--p, 0) * -80px)) scale(calc(1 - var(--p, 0) * .08)); will-change: transform, opacity; }
+    .hero__eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--fg-muted); padding: 6px 14px 6px 8px; border: 1px solid var(--line-strong); border-radius: 999px; background: rgba(255, 255, 255, .03); margin-bottom: 28px; }
+    .hero__eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(34, 197, 94, .18); animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(34, 197, 94, .06); } }
+    .hero__title { font-size: clamp(44px, 8.4vw, 112px); font-weight: 700; line-height: .98; letter-spacing: -.045em; }
+    .hero__sub { margin: 26px auto 0; max-width: 640px; font-size: clamp(18px, 2vw, 22px); line-height: 1.4; color: var(--fg-muted); font-weight: 400; letter-spacing: -.01em; }
+    .hero__actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 8px; margin-top: 34px; }
+
+    .hero__visual { position: absolute; left: 50%; top: 50%; width: min(1100px, 94vw, 150vh); perspective: 1400px; transform: translate(-50%, calc(-50% + (1 - var(--p, 0)) * 56vh + var(--nav-h) / 2)); will-change: transform; }
+    .diagram { width: 100%; height: auto; transform-origin: 50% 100%; transform: rotateX(calc(52deg - var(--p, 0) * 52deg)) scale(calc(.9 + var(--p, 0) * .12)); filter: drop-shadow(0 40px 80px rgba(59, 130, 246, .25)); will-change: transform; }
+    .diagram .cls rect.body { fill: rgba(17, 17, 24, .92); stroke: rgba(255, 255, 255, .14); }
+    .diagram .cls rect.head { fill: url(#headGrad); }
+    .diagram .cls text { font-family: var(--mono); fill: #D4D4D8; font-size: 13px; }
+    .diagram .cls text.name { font-family: var(--font); fill: #fff; font-weight: 600; font-size: 15px; }
+    .diagram .cls text.type { fill: #71717A; }
+    .diagram .cls text.pk { fill: #FBBF24; }
+    .diagram .rel { fill: none; stroke: url(#relGrad); stroke-width: 1.6; stroke-dasharray: 5 6; animation: flow 1.6s linear infinite; }
+    .diagram .rel-label { font-family: var(--mono); font-size: 11px; fill: #A1A1AA; }
+    @keyframes flow { to { stroke-dashoffset: -22; } }
+    .scroll-hint { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--fg-dim); letter-spacing: .08em; text-transform: uppercase; opacity: calc(1 - var(--p, 0) * 4); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; }
+    .scroll-hint span { width: 1px; height: 32px; background: linear-gradient(var(--fg-dim), transparent); animation: drip 2s var(--ease) infinite; transform-origin: top; }
+    @keyframes drip { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+    /* ---------- Statement (word-by-word reveal) ---------- */
+    .statement { position: relative; height: 220vh; }
+    .statement__stage { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; }
+    .statement__text { font-size: clamp(32px, 5.2vw, 72px); font-weight: 600; line-height: 1.08; letter-spacing: -.035em; max-width: 1050px; }
+    .statement__text .w { opacity: .14; transition: opacity .25s linear; }
+    .statement__text .w.on { opacity: 1; }
+    .statement__text .accent.on { color: var(--blue-2); }
+
+    /* ---------- Section heads ---------- */
+    .section { position: relative; padding: 140px 0; }
+    .section-head { text-align: center; max-width: 900px; margin: 0 auto 72px; }
+    .section-head .eyebrow { display: block; margin-bottom: 14px; }
+    .section-title { font-size: clamp(40px, 6.4vw, 88px); font-weight: 700; line-height: 1; letter-spacing: -.045em; }
+    .section-lead { margin-top: 24px; font-size: clamp(18px, 2vw, 22px); color: var(--fg-muted); line-height: 1.45; letter-spacing: -.01em; }
+
+    /* ---------- Generator (pinned tab story) ---------- */
+    .gen { position: relative; height: 420vh; }
+    .gen__stage { position: sticky; top: 0; height: 100vh; min-height: 680px; display: flex; align-items: center; overflow: hidden; }
+    .gen__stage::before { content: ""; position: absolute; width: 900px; height: 900px; right: -200px; top: 50%; transform: translateY(-50%); background: radial-gradient(closest-side, rgba(59, 130, 246, .22), transparent 70%); pointer-events: none; }
+    .gen__grid { position: relative; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.25fr); gap: 72px; align-items: center; }
+    .gen__copy .eyebrow { color: var(--blue-2); margin-bottom: 18px; display: block; }
+    .gen__title { font-size: clamp(36px, 4.6vw, 64px); font-weight: 700; letter-spacing: -.04em; line-height: 1.02; }
+    .gen__desc { margin-top: 22px; color: var(--fg-muted); font-size: 18px; line-height: 1.55; max-width: 480px; }
+    .formats { list-style: none; padding: 0; margin: 36px 0 0; display: grid; gap: 4px; }
+    .format { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 14px; border: 0; border-radius: 12px; background: transparent; color: var(--fg-dim); font: 500 17px/1.2 var(--font); text-align: left; cursor: pointer; transition: color .3s var(--ease), background-color .3s var(--ease); }
+    .format:hover { color: var(--fg-muted); }
+    .format .bar { width: 3px; height: 22px; border-radius: 3px; background: var(--line-strong); position: relative; overflow: hidden; flex: none; }
+    .format .bar::after { content: ""; position: absolute; inset: 0; background: var(--blue); transform: scaleY(var(--fill, 0)); transform-origin: top; }
+    .format.is-active { color: var(--fg); background: rgba(255, 255, 255, .04); }
+    .format small { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--fg-dim); }
+
+    .window { position: relative; border-radius: 18px; background: linear-gradient(180deg, #15151D, #0D0D13); border: 1px solid var(--line-strong); box-shadow: 0 50px 120px -30px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .02) inset, 0 30px 80px -40px rgba(59, 130, 246, .5); overflow: hidden; }
+    .window__bar { display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+    .window__bar i { width: 12px; height: 12px; border-radius: 50%; background: #3F3F46; }
+    .window__bar i:nth-child(1) { background: #FF5F57; } .window__bar i:nth-child(2) { background: #FEBC2E; } .window__bar i:nth-child(3) { background: #28C840; }
+    .window__file { margin-left: 14px; font-family: var(--mono); font-size: 12px; color: var(--fg-dim); }
+    .window__tag { margin-left: auto; font-size: 11px; color: var(--fg-dim); border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px 8px; }
+    .window__split { display: grid; grid-template-columns: 180px minmax(0, 1fr); min-height: 380px; }
+    .tree { border-right: 1px solid var(--line); padding: 16px 12px; font-size: 13px; color: var(--fg-dim); font-family: var(--mono); }
+    .tree p { padding: 5px 8px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tree p.h { color: var(--fg-muted); font-family: var(--font); font-weight: 600; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+    .tree p.sel { background: rgba(59, 130, 246, .14); color: var(--blue-2); }
+    .codes { position: relative; }
+    .code { position: absolute; inset: 0; margin: 0; padding: 22px 24px; font: 13.5px/1.75 var(--mono); color: #D4D4D8; white-space: pre; overflow: hidden; opacity: 0; transform: translateY(14px); transition: opacity .45s var(--ease), transform .45s var(--ease); }
+    .code.is-active { opacity: 1; transform: none; }
+    .k { color: #C084FC; } .t { color: #67E8F9; } .s { color: #86EFAC; } .c { color: #71717A; } .n { color: #FBBF24; } .p { color: #93C5FD; }
+
+    /* ---------- Validator (light section) ---------- */
+    .light { background: var(--light-bg); color: var(--light-fg); }
+    .light .section-lead { color: var(--light-muted); }
+    .light .eyebrow { color: #15803D; }
+    .dash { position: relative; max-width: 1040px; margin: 0 auto; border-radius: 28px; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, .04), 0 40px 100px -40px rgba(0, 0, 0, .25); padding: 48px 36px 36px; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 40px; }
+    .dash__tag { position: absolute; top: 14px; right: 18px; font-size: 11px; color: var(--light-muted); border: 1px solid #E5E5EA; border-radius: 999px; padding: 2px 9px; }
+    .score { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 12px; border-radius: 20px; background: linear-gradient(180deg, #F0FDF4, #FFFFFF); }
+    .ring { position: relative; width: 200px; height: 200px; }
+    .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring circle { fill: none; stroke-width: 14; }
+    .ring .track { stroke: #E5E7EB; }
+    .ring .val { stroke: url(#ringGrad); stroke-linecap: round; stroke-dasharray: 534; stroke-dashoffset: 534; transition: stroke-dashoffset 1.8s var(--ease); }
+    .ring__num { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+    .ring__num b { font-size: 52px; font-weight: 700; letter-spacing: -.04em; line-height: 1; display: block; }
+    .ring__num small { font-size: 13px; color: var(--light-muted); display: block; margin-top: 4px; }
+    .score p { font-size: 14px; color: var(--light-muted); text-align: center; }
+    .cats { display: grid; gap: 22px; align-content: center; }
+    .cat__row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .cat__row span:last-child { font-family: var(--mono); font-weight: 500; color: var(--light-muted); }
+    .meter { height: 10px; border-radius: 99px; background: #F1F1F4; overflow: hidden; }
+    .meter i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #16A34A, #22C55E); transition: width 1.6s var(--ease); }
+    .meter i.warn { background: linear-gradient(90deg, #D97706, #F59E0B); }
+    .checks { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+    .check { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: #FAFAFB; border: 1px solid #F0F0F3; font-size: 14px; opacity: 0; transform: translateY(10px); transition: opacity .5s var(--ease), transform .5s var(--ease); }
+    .check svg { width: 20px; height: 20px; flex: none; }
+    .check code { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--light-muted); }
+    .in .check { opacity: 1; transform: none; }
+    .feat3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; max-width: 1040px; margin: 80px auto 0; }
+    .feat3 h3 { font-size: 21px; font-weight: 600; letter-spacing: -.02em; margin: 14px 0 8px; }
+    .feat3 p { color: var(--light-muted); font-size: 16px; }
+    .feat3 svg { width: 36px; height: 36px; }
+
+    /* ---------- LOD graph ---------- */
+    .lod { overflow: hidden; }
+    .lod::before { content: ""; position: absolute; left: 50%; top: 55%; width: 1200px; height: 900px; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgba(167, 139, 250, .22), rgba(34, 211, 238, .08) 50%, transparent 75%); pointer-events: none; }
+    .lod .eyebrow { color: var(--violet); }
+    .graph-wrap { position: relative; max-width: 1100px; margin: 0 auto; aspect-ratio: 16 / 9; }
+    .graph-tag { position: absolute; top: 0; right: 0; font-size: 11px; color: var(--fg-dim); border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px 9px; }
+    .graph { width: 100%; height: 100%; overflow: visible; }
+    .graph .edge { stroke: rgba(196, 181, 253, .22); stroke-width: 1; }
+    .graph .edge.hot { stroke: rgba(196, 181, 253, .75); stroke-width: 1.5; }
+    .graph .node circle { transition: r .3s var(--ease); }
+    .graph .node.domain circle { fill: url(#nodeGrad); }
+    .graph .node.cls circle { fill: #18181F; stroke: rgba(196, 181, 253, .55); stroke-width: 1.2; }
+    .graph .node text { font-family: var(--font); font-size: 13px; fill: #E4E4E7; text-anchor: middle; pointer-events: none; }
+    .graph .node.cls text { font-family: var(--mono); font-size: 10.5px; fill: #A1A1AA; }
+    .graph .node { cursor: pointer; }
+    .graph .pulse { fill: none; stroke: rgba(167, 139, 250, .5); animation: ring 3s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes ring { from { transform: scale(1); opacity: .8; } to { transform: scale(2.4); opacity: 0; } }
+    .chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 48px; }
+    .chip { font-size: 14px; color: var(--fg-muted); padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line-strong); background: rgba(255, 255, 255, .03); }
+
+    /* ---------- Flow ---------- */
+    .flow__track { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0; max-width: 1100px; margin: 0 auto; }
+    .flow__node { text-align: center; padding: 30px 20px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); }
+    .flow__node--core { background: linear-gradient(160deg, rgba(59, 130, 246, .18), rgba(167, 139, 250, .1) 60%, var(--card)); border-color: rgba(147, 197, 253, .3); box-shadow: 0 30px 80px -30px rgba(59, 130, 246, .45); }
+    .flow__node svg { width: 44px; height: 44px; margin: 0 auto 16px; }
+    .flow__node h3 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+    .flow__node p { margin-top: 6px; font-size: 14px; color: var(--fg-muted); }
+    .flow__outs { display: grid; gap: 8px; margin-top: 16px; }
+    .flow__outs span { font-size: 13px; padding: 7px 10px; border-radius: 10px; background: rgba(255, 255, 255, .04); color: var(--fg-muted); }
+    .flow__link { width: 90px; height: 2px; position: relative; overflow: hidden; background: var(--line); }
+    .flow__link::after { content: ""; position: absolute; inset: 0; width: 40%; background: linear-gradient(90deg, transparent, var(--blue-2), transparent); animation: beam 2.2s var(--ease) infinite; }
+    @keyframes beam { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+
+    /* ---------- Tools bento ---------- */
+    .tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+    .tool { position: relative; display: flex; flex-direction: column; min-height: 460px; padding: 36px 32px 32px; border-radius: 28px; background: var(--card); border: 1px solid var(--line); text-decoration: none; overflow: hidden; isolation: isolate; transition: transform .4s var(--ease), border-color .4s var(--ease); }
+    .tool::before { content: ""; position: absolute; inset: auto -30% -40% -30%; height: 75%; background: radial-gradient(closest-side, var(--glow), transparent 70%); opacity: .55; transition: opacity .4s var(--ease), transform .6s var(--ease); z-index: -1; }
+    .tool:hover { transform: translateY(-6px); border-color: var(--line-strong); }
+    .tool:hover::before { opacity: 1; transform: translateY(-8%); }
+    .tool--gen { --glow: rgba(59, 130, 246, .55); --c: var(--blue-2); }
+    .tool--val { --glow: rgba(34, 197, 94, .45); --c: var(--green-2); }
+    .tool--lod { --glow: rgba(167, 139, 250, .5); --c: var(--violet-2); }
+    .tool__badge { align-self: flex-start; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--c); }
+    .tool h3 { margin-top: 14px; font-size: 30px; font-weight: 700; letter-spacing: -.035em; line-height: 1.08; }
+    .tool p { margin-top: 14px; color: var(--fg-muted); font-size: 16px; line-height: 1.55; }
+    .tool__meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+    .tool__meta span { font-size: 12px; color: var(--fg-muted); padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, .05); }
+    .tool__go { margin-top: auto; padding-top: 28px; display: flex; align-items: center; justify-content: space-between; color: var(--c); font-weight: 500; }
+    .tool__go .arrow { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, .08); color: var(--fg); transition: background-color .3s var(--ease), transform .3s var(--ease); }
+    .tool:hover .tool__go .arrow { background: var(--c); color: #000; transform: rotate(-45deg); }
+
+    /* ---------- Footer ---------- */
+    .footer { border-top: 1px solid var(--line); padding: 28px 0 40px; font-size: 12px; color: var(--fg-dim); }
+    .footer__inner { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .footer a { color: var(--fg-muted); text-decoration: none; }
+    .footer a:hover { color: var(--fg); text-decoration: underline; }
+
+    /* ---------- Reveal ---------- */
+    .js .rv { opacity: 0; transform: translateY(40px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+    .js .rv.in { opacity: 1; transform: none; }
+    .js .rv-d1 { transition-delay: .1s; } .js .rv-d2 { transition-delay: .2s; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 980px) {
+      .gen { height: auto; }
+      .gen__stage { position: relative; height: auto; min-height: 0; padding: 120px 0; }
+      .gen__grid { grid-template-columns: 1fr; gap: 48px; }
+      .dash { grid-template-columns: 1fr; padding: 28px 22px; }
+      .feat3 { grid-template-columns: 1fr; gap: 28px; }
+      .tools { grid-template-columns: 1fr; }
+      .tool { min-height: 0; }
+      .flow__track { grid-template-columns: 1fr; justify-items: stretch; }
+      .flow__link { width: 2px; height: 48px; margin: 0 auto; }
+      .flow__link::after { width: 100%; height: 40%; background: linear-gradient(180deg, transparent, var(--blue-2), transparent); animation-name: beamY; }
+      @keyframes beamY { from { transform: translateY(-100%); } to { transform: translateY(260%); } }
+    }
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+      .wrap { padding: 0 16px; }
+      .section { padding: 100px 0; }
+      .section-head { margin-bottom: 48px; }
+      .hero__stage { padding-top: calc(var(--nav-h) + 7vh); }
+      .hero__visual { width: 150vw; }
+      .window__split { grid-template-columns: 1fr; min-height: 330px; }
+      .tree { display: none; }
+      .code { font-size: 12px; padding: 18px; }
+      .graph-wrap { aspect-ratio: auto; overflow: hidden; margin: 0 -16px; padding-top: 28px; }
+      .graph-tag { right: 16px; }
+      .graph { width: 175%; height: auto; margin-left: -37.5%; }
+      .graph .node.domain text { font-size: 24px; font-weight: 600; }
+      .graph .node.cls text { display: none; }
+      .tool { padding: 28px 24px 24px; }
     }
 
-    .page {
-      width: 100%;
-      max-width: 980px;
-      margin: 32px 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .logo-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(22, 100, 216, 0.12);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--accent);
-      margin-bottom: 12px;
-    }
-
-    .logo-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #1664d8, #47a3ff);
-      box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
-      animation: pulse 2.2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
-      }
-      50% {
-        transform: scale(1.12);
-        box-shadow: 0 0 0 6px rgba(22, 100, 216, 0.08);
-      }
-      100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 3px rgba(22, 100, 216, 0.15);
-      }
-    }
-
-    h1 {
-      font-size: 30px;
-      font-weight: 650;
-      letter-spacing: -0.03em;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      font-size: 15px;
-      color: var(--text-muted);
-      max-width: 620px;
-      margin: 0 auto;
-      line-height: 1.5;
-    }
-
-    main {
-      margin-top: 24px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 20px;
-    }
-
-    @media (max-width: 720px) {
-      .page {
-        margin: 20px 12px;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      .cards {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .card-link {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 20px 20px 18px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(15, 35, 95, 0.05);
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
-      transition: transform var(--transition-fast), 
-                  box-shadow var(--transition-fast), 
-                  border-color var(--transition-fast), 
-                  background-color var(--transition-fast);
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top right, rgba(22, 100, 216, 0.08), transparent 55%);
-      opacity: 0;
-      transition: opacity var(--transition-fast);
-      z-index: -1;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 40px rgba(15, 35, 95, 0.16);
-      border-color: rgba(22, 100, 216, 0.28);
-      background-color: #ffffff;
-    }
-
-    .card:hover::before {
-      opacity: 1;
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-
-    .badge {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 4px 9px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border: 1px solid rgba(22, 100, 216, 0.3);
-      white-space: nowrap;
-    }
-
-    .card-body {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-
-    .meta {
-      font-size: 12px;
-      color: var(--text-muted);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 14px;
-      margin-bottom: 14px;
-    }
-
-    .meta-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: #f2f5fb;
-    }
-
-    .meta-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: #9fb4ff;
-    }
-
-    .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-top: auto;
-      padding-top: 6px;
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: none;
-      font-size: 13px;
-      font-weight: 500;
-      background: var(--accent);
-      color: #ffffff;
-      cursor: pointer;
-      transition: background-color var(--transition-fast), 
-                  transform var(--transition-fast), 
-                  box-shadow var(--transition-fast);
-      box-shadow: 0 8px 18px rgba(22, 100, 216, 0.28);
-      white-space: nowrap;
-    }
-
-    .button span.arrow {
-      font-size: 14px;
-      transform: translateX(0);
-      transition: transform var(--transition-fast);
-    }
-
-    .card:hover .button {
-      background-color: #124eaa;
-      transform: translateY(-1px);
-      box-shadow: 0 12px 26px rgba(15, 35, 95, 0.35);
-    }
-
-    .card:hover .button span.arrow {
-      transform: translateX(2px);
-    }
-
-    .hint {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .footer-link {
-      color: inherit;
-      text-decoration: none;
-      transition: text-decoration var(--transition-fast);
-    }
-
-    .footer-link:hover {
-      text-decoration: underline;
-    }
-
-    footer {
-      margin-top: 32px;
-      text-align: center;
-      font-size: 11px;
-      color: var(--text-muted);
-      opacity: 0.8;
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+      .hero, .statement, .gen { height: auto; }
+      .hero__stage, .statement__stage, .gen__stage { position: relative; height: auto; min-height: 0; }
+      .hero__stage { padding-bottom: 0; }
+      .hero__visual { position: relative; left: auto; bottom: auto; transform: none; margin: 60px auto 0; }
+      .diagram { transform: none; }
+      .statement__stage { padding: 120px 0; }
+      .statement__text .w { opacity: 1; }
+      .js .rv { opacity: 1; transform: none; }
+      .check { opacity: 1; transform: none; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <div class="logo-pill">
-        <div class="logo-dot"></div>
-        <span>SchemaLab</span>
+  <a class="skip" href="#main">Naar inhoud</a>
+
+  <!-- Nav -->
+  <header class="nav" id="nav">
+    <div class="wrap nav__inner">
+      <a class="logo" href="#top" aria-label="SchemaLab, naar boven">
+        <svg class="logo__mark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93C5FD"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs><rect x="2" y="2" width="9" height="9" rx="2.5" fill="url(#lg)"/><rect x="13" y="13" width="9" height="9" rx="2.5" fill="url(#lg)" opacity=".6"/><path d="M11 6.5h4.5a2 2 0 0 1 2 2V13" stroke="url(#lg)" stroke-width="1.6" fill="none"/></svg>
+        SchemaLab
+      </a>
+      <nav aria-label="Hoofdmenu">
+        <ul class="nav__links">
+          <li><a href="#generator">Generator</a></li>
+          <li><a href="#validator">Validator</a></li>
+          <li><a href="#lod">LOD Browser</a></li>
+          <li><a href="#flow">Hoe het werkt</a></li>
+        </ul>
+      </nav>
+      <a class="nav__cta" href="#tools">Open de tools</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero" id="top" aria-labelledby="heroTitle">
+      <div class="hero__stage" id="heroStage">
+        <div class="hero__grid-bg" aria-hidden="true"></div>
+        <div class="hero__glow" aria-hidden="true"></div>
+        <div class="hero__copy">
+          <p class="hero__eyebrow"><span class="dot" aria-hidden="true"></span>Tooling voor gegevensmodellen</p>
+          <h1 class="hero__title" id="heroTitle"><span class="grad-white">Eén model.</span><br><span class="grad-blue">Overal inzetbaar.</span></h1>
+          <p class="hero__sub">SchemaLab maakt Enterprise Architect-modellen bruikbaar buiten EA zelf: van DDL-generatie tot modelvalidatie en Linked Open Data.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#tools">Bekijk de tools</a>
+            <a class="btn btn--link" href="#flow">Hoe het werkt <span class="chev" aria-hidden="true">&rsaquo;</span></a>
+          </div>
+        </div>
+
+        <div class="hero__visual" aria-hidden="true">
+          <svg class="diagram" viewBox="0 0 1000 560" role="img">
+            <defs>
+              <linearGradient id="headGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1D4ED8"/><stop offset="1" stop-color="#6D28D9"/></linearGradient>
+              <linearGradient id="relGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93C5FD"/><stop offset="1" stop-color="#C4B5FD"/></linearGradient>
+            </defs>
+            <!-- relations -->
+            <path class="rel" d="M300 130 C 380 130, 400 110, 470 110"/>
+            <text class="rel-label" x="350" y="104">woont op</text>
+            <path class="rel" d="M180 250 C 180 330, 300 360, 380 380"/>
+            <text class="rel-label" x="196" y="338">is betrokken bij</text>
+            <path class="rel" d="M620 400 C 680 400, 690 400, 730 400"/>
+            <text class="rel-label" x="636" y="390">behandelt</text>
+            <path class="rel" d="M600 200 C 600 260, 560 300, 540 330"/>
+
+            <g class="cls" transform="translate(60,40)">
+              <rect class="body" width="240" height="210" rx="12"/>
+              <rect class="head" width="240" height="40" rx="12"/><rect class="head" y="28" width="240" height="12"/>
+              <text class="name" x="16" y="26">Persoon</text>
+              <text class="pk" x="16" y="70">◆ id</text><text class="type" x="170" y="70">integer</text>
+              <text x="16" y="98">voornamen</text><text class="type" x="170" y="98">varchar</text>
+              <text x="16" y="126">geslachtsnaam</text><text class="type" x="170" y="126">varchar</text>
+              <text x="16" y="154">geboortedatum</text><text class="type" x="170" y="154">date</text>
+              <text x="16" y="182">adres_id</text><text class="type" x="170" y="182">integer</text>
+            </g>
+            <g class="cls" transform="translate(470,40)">
+              <rect class="body" width="250" height="160" rx="12"/>
+              <rect class="head" width="250" height="40" rx="12"/><rect class="head" y="28" width="250" height="12"/>
+              <text class="name" x="16" y="26">Adres</text>
+              <text class="pk" x="16" y="70">◆ id</text><text class="type" x="180" y="70">integer</text>
+              <text x="16" y="98">straatnaam</text><text class="type" x="180" y="98">varchar</text>
+              <text x="16" y="126">huisnummer</text><text class="type" x="180" y="126">integer</text>
+              <text x="16" y="152">postcode</text><text class="type" x="180" y="152">char(6)</text>
+            </g>
+            <g class="cls" transform="translate(380,330)">
+              <rect class="body" width="240" height="160" rx="12"/>
+              <rect class="head" width="240" height="40" rx="12"/><rect class="head" y="28" width="240" height="12"/>
+              <text class="name" x="16" y="26">Zaak</text>
+              <text class="pk" x="16" y="70">◆ id</text><text class="type" x="170" y="70">integer</text>
+              <text x="16" y="98">omschrijving</text><text class="type" x="170" y="98">text</text>
+              <text x="16" y="126">startdatum</text><text class="type" x="170" y="126">date</text>
+              <text x="16" y="152">status</text><text class="type" x="170" y="152">varchar</text>
+            </g>
+            <g class="cls" transform="translate(730,330)">
+              <rect class="body" width="220" height="132" rx="12"/>
+              <rect class="head" width="220" height="40" rx="12"/><rect class="head" y="28" width="220" height="12"/>
+              <text class="name" x="16" y="26">Medewerker</text>
+              <text class="pk" x="16" y="70">◆ id</text><text class="type" x="150" y="70">integer</text>
+              <text x="16" y="98">naam</text><text class="type" x="150" y="98">varchar</text>
+              <text x="16" y="124">functie</text><text class="type" x="150" y="124">varchar</text>
+            </g>
+          </svg>
+        </div>
+        <div class="scroll-hint" aria-hidden="true">Scroll<span></span></div>
       </div>
-      <h1>Tools voor gegevensmodellen</h1>
-      <p class="subtitle">
-        SchemaLab maakt Enterprise Architect-modellen bruikbaar buiten EA zelf: 
-        van DDL-generatie tot modelvalidatie en Linked Open Data.
-      </p>
-    </header>
+    </section>
 
-    <main>
-      <div class="cards">
-
-        <!-- DDL Generator -->
-        <a class="card-link" href="https://ggm-generator.schemalab.app">
-          <article class="card">
-            <div class="card-header">
-              <h2 class="card-title">GGM Schema Generator</h2>
-              <div class="badge">Generator</div>
-            </div>
-            <p class="card-body">
-              Genereer automatisch database schema's zoals SQL DDL, dbdiagram.io, PlantUML en RDF/Turtle vanuit je 
-              Enterprise Architect-modellen. Geschikt voor het Gemeentelijk Gegevensmodel 
-              en andere domeinmodellen.
-            </p>
-            <div class="meta">
-              <div class="meta-item">
-                <span class="meta-dot"></span>
-                <span>Enterprise Architect → DDL</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-dot"></span>
-                <span>visualisaties</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-dot"></span>
-                <span>Linked Open Data</span>
-              </div>
-            </div>
-            <div class="card-footer">
-              <div class="button">
-                <span>Naar generator</span>
-                <span class="arrow">↗</span>
-              </div>
-              <span class="hint">Opent in een nieuwe omgeving</span>
-            </div>
-          </article>
-        </a>
-
-        <!-- Model Validator -->
-        <a class="card-link" href="https://ggm-validator.schemalab.app">
-          <article class="card">
-            <div class="card-header">
-              <h2 class="card-title">GGM Schema Validator</h2>
-              <div class="badge">Validator</div>
-            </div>
-            <p class="card-body">
-              Systematische kwaliteitscontrole van het GGM-model.
-              De applicatie controleert structuur, semantiek en consistentie op basis van expliciete datakwaliteitsregels en presenteert de resultaten in een overzichtelijk dashboard.
-            </p>
-            <div class="meta">
-              <div class="meta-item">
-                <span class="meta-dot"></span>
-                <span>Data Kwaliteit</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-dot"></span>
-                <span>Dynamische rapportage</span>
-              </div>
-            </div>
-            <div class="card-footer">
-              <div class="button">
-                <span>Naar validator</span>
-                <span class="arrow">↗</span>
-              </div>
-              <span class="hint">Opent in een nieuwe omgeving</span>
-            </div>
-          </article>
-        </a>
-
-        <!-- GGM LOD Browser -->
-        <a class="card-link" href="https://lod.gemeentelijkgegevensmodel.nl/">
-          <article class="card">
-            <div class="card-header">
-              <h2 class="card-title">GGM LOD Browser</h2>
-              <div class="badge">LOD Browser</div>
-            </div>
-            <p class="card-body">
-              Ontdek het Gemeentelijk Gegevensmodel als Linked Open Data in een intuïtieve webinterface. 
-              Blader eenvoudig door domeinen, klassen en relaties – machine-readable én mensvriendelijk.
-            </p>
-            <div class="meta">
-              <div class="meta-item">
-                <span class="meta-dot"></span>
-                <span>Linked Open Data</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-dot"></span>
-                <span>Intuïtieve navigatie</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-dot"></span>
-                <span>RDF</span>
-              </div>
-            </div>
-            <div class="card-footer">
-              <div class="button">
-                <span>Naar LOD Browser</span>
-                <span class="arrow">↗</span>
-              </div>
-              <span class="hint">Opent in een nieuwe omgeving</span>
-            </div>
-          </article>
-        </a>
-
+    <!-- Statement -->
+    <section class="statement" id="statement" aria-label="Wat SchemaLab doet">
+      <div class="statement__stage">
+        <div class="wrap">
+          <p class="statement__text" id="statementText">SchemaLab maakt Enterprise Architect-modellen bruikbaar buiten EA zelf. Genereer <span class="accent">schema's,</span> bewaak de <span class="accent">kwaliteit</span> en publiceer als <span class="accent">Linked Open Data</span> &mdash; vanuit één bron.</p>
+        </div>
       </div>
-    </main>
+    </section>
 
-<footer>
-      © 2026 SchemaLab — Tooling voor gegevensmodellen · by 
-      <a href="https://github.com/AshkanA" class="footer-link">Ashkan Ashkpour</a>
-    </footer>
+    <!-- Generator -->
+    <section class="gen" id="generator" aria-labelledby="genTitle">
+      <div class="gen__stage">
+        <div class="wrap gen__grid">
+          <div class="gen__copy">
+            <span class="eyebrow">GGM Schema Generator</span>
+            <h2 class="gen__title" id="genTitle">Van model naar schema.<br><span class="grad-blue">Automatisch.</span></h2>
+            <p class="gen__desc">Genereer automatisch database schema's zoals SQL DDL, dbdiagram.io, PlantUML en RDF/Turtle vanuit je Enterprise Architect-modellen. Geschikt voor het Gemeentelijk Gegevensmodel en andere domeinmodellen.</p>
+            <ul class="formats" role="tablist" aria-label="Uitvoerformaten">
+              <li><button class="format is-active" role="tab" aria-selected="true" aria-controls="code0" id="tab0" data-i="0"><span class="bar"></span>SQL DDL<small>.sql</small></button></li>
+              <li><button class="format" role="tab" aria-selected="false" aria-controls="code1" id="tab1" data-i="1" tabindex="-1"><span class="bar"></span>dbdiagram.io<small>.dbml</small></button></li>
+              <li><button class="format" role="tab" aria-selected="false" aria-controls="code2" id="tab2" data-i="2" tabindex="-1"><span class="bar"></span>PlantUML<small>.puml</small></button></li>
+              <li><button class="format" role="tab" aria-selected="false" aria-controls="code3" id="tab3" data-i="3" tabindex="-1"><span class="bar"></span>RDF/Turtle<small>.ttl</small></button></li>
+            </ul>
+          </div>
 
-  </div>
+          <div class="window">
+            <div class="window__bar"><i></i><i></i><i></i><span class="window__file" id="fileName">persoon.sql</span><span class="window__tag">Voorbeeld</span></div>
+            <div class="window__split">
+              <div class="tree" aria-hidden="true">
+                <p class="h">Model</p>
+                <p class="sel">▸ Persoon</p>
+                <p>▸ Adres</p>
+                <p>▸ Zaak</p>
+                <p>▸ Medewerker</p>
+                <p class="h" style="margin-top:14px">Uitvoer</p>
+                <p id="treeOut">ddl/</p>
+              </div>
+              <div class="codes">
+<pre class="code is-active" id="code0" role="tabpanel" aria-labelledby="tab0"><span class="c">-- Gegenereerd uit Enterprise Architect</span>
+<span class="k">CREATE TABLE</span> <span class="t">persoon</span> (
+  id             <span class="p">INTEGER</span> <span class="k">PRIMARY KEY</span>,
+  voornamen      <span class="p">VARCHAR</span>(<span class="n">200</span>),
+  geslachtsnaam  <span class="p">VARCHAR</span>(<span class="n">200</span>),
+  geboortedatum  <span class="p">DATE</span>,
+  adres_id       <span class="p">INTEGER</span>
+    <span class="k">REFERENCES</span> <span class="t">adres</span>(id)
+);
+
+<span class="k">CREATE TABLE</span> <span class="t">adres</span> (
+  id             <span class="p">INTEGER</span> <span class="k">PRIMARY KEY</span>,
+  straatnaam     <span class="p">VARCHAR</span>(<span class="n">255</span>),
+  postcode       <span class="p">CHAR</span>(<span class="n">6</span>)
+);</pre>
+<pre class="code" id="code1" role="tabpanel" aria-labelledby="tab1"><span class="c">// dbdiagram.io</span>
+<span class="k">Table</span> <span class="t">persoon</span> {
+  id             <span class="p">integer</span> [<span class="k">pk</span>]
+  voornamen      <span class="p">varchar</span>
+  geslachtsnaam  <span class="p">varchar</span>
+  geboortedatum  <span class="p">date</span>
+  adres_id       <span class="p">integer</span> [<span class="k">ref</span>: &gt; <span class="t">adres</span>.id]
+}
+
+<span class="k">Table</span> <span class="t">adres</span> {
+  id             <span class="p">integer</span> [<span class="k">pk</span>]
+  straatnaam     <span class="p">varchar</span>
+  postcode       <span class="p">char</span>(<span class="n">6</span>)
+}</pre>
+<pre class="code" id="code2" role="tabpanel" aria-labelledby="tab2"><span class="k">@startuml</span>
+<span class="k">class</span> <span class="t">Persoon</span> {
+  voornamen : <span class="p">String</span>
+  geslachtsnaam : <span class="p">String</span>
+  geboortedatum : <span class="p">Date</span>
+}
+<span class="k">class</span> <span class="t">Adres</span> {
+  straatnaam : <span class="p">String</span>
+  postcode : <span class="p">String</span>
+}
+<span class="t">Persoon</span> <span class="s">"0..*"</span> --&gt; <span class="s">"1"</span> <span class="t">Adres</span> : woont op
+<span class="k">@enduml</span></pre>
+<pre class="code" id="code3" role="tabpanel" aria-labelledby="tab3"><span class="t">:Persoon</span> <span class="k">a</span> <span class="p">owl:Class</span> ;
+  <span class="p">rdfs:label</span> <span class="s">"Persoon"@nl</span> .
+
+<span class="t">:geboortedatum</span> <span class="k">a</span> <span class="p">owl:DatatypeProperty</span> ;
+  <span class="p">rdfs:domain</span> <span class="t">:Persoon</span> ;
+  <span class="p">rdfs:range</span>  <span class="p">xsd:date</span> .
+
+<span class="t">:woontOp</span> <span class="k">a</span> <span class="p">owl:ObjectProperty</span> ;
+  <span class="p">rdfs:domain</span> <span class="t">:Persoon</span> ;
+  <span class="p">rdfs:range</span>  <span class="t">:Adres</span> .</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Validator -->
+    <section class="section light" id="validator" aria-labelledby="valTitle">
+      <div class="wrap">
+        <div class="section-head rv">
+          <span class="eyebrow">GGM Schema Validator</span>
+          <h2 class="section-title" id="valTitle">Kwaliteit die je<br><span class="grad-green">kunt zien.</span></h2>
+          <p class="section-lead">Systematische kwaliteitscontrole van het GGM-model. De applicatie controleert structuur, semantiek en consistentie op basis van expliciete datakwaliteitsregels en presenteert de resultaten in een overzichtelijk dashboard.</p>
+        </div>
+
+        <div class="dash rv" id="dash">
+          <span class="dash__tag">Illustratie</span>
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#16A34A"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs></svg>
+          <div class="score">
+            <div class="ring" role="img" aria-label="Voorbeeldscore modelkwaliteit">
+              <svg viewBox="0 0 200 200"><circle class="track" cx="100" cy="100" r="85"/><circle class="val" id="ringVal" cx="100" cy="100" r="85" data-value="0.92"/></svg>
+              <div class="ring__num"><div><b id="ringNum">0</b><small>kwaliteitsscore</small></div></div>
+            </div>
+            <p>Eén oogopslag: hoe gezond is het model?</p>
+          </div>
+          <div class="cats">
+            <div class="cat"><div class="cat__row"><span>Structuur</span><span>96%</span></div><div class="meter"><i data-w="96"></i></div></div>
+            <div class="cat"><div class="cat__row"><span>Semantiek</span><span>91%</span></div><div class="meter"><i data-w="91"></i></div></div>
+            <div class="cat"><div class="cat__row"><span>Consistentie</span><span>78%</span></div><div class="meter"><i class="warn" data-w="78"></i></div></div>
+            <ul class="checks">
+              <li class="check" style="transition-delay:.2s"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#DCFCE7"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#16A34A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Elke klasse heeft een definitie<code>STR-01</code></li>
+              <li class="check" style="transition-delay:.35s"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#DCFCE7"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#16A34A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Relaties verwijzen naar bestaande klassen<code>SEM-04</code></li>
+              <li class="check" style="transition-delay:.5s"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#FEF3C7"/><path d="M12 7.5v5.5M12 16.5v.01" stroke="#D97706" stroke-width="2.2" stroke-linecap="round"/></svg>Naamgeving attributen niet overal gelijk<code>CON-02</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feat3">
+          <div class="rv"><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="3" y="3" width="30" height="30" rx="9" fill="#DCFCE7"/><path d="M11 13h14M11 18h14M11 23h9" stroke="#15803D" stroke-width="2" stroke-linecap="round"/></svg><h3>Expliciete regels</h3><p>Kwaliteitsregels die vastleggen wat een goed model is, zodat controles herhaalbaar zijn.</p></div>
+          <div class="rv rv-d1"><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="3" y="3" width="30" height="30" rx="9" fill="#DCFCE7"/><path d="M11 24v-5M18 24V12M25 24v-8" stroke="#15803D" stroke-width="2.4" stroke-linecap="round"/></svg><h3>Overzichtelijk dashboard</h3><p>Resultaten per categorie, zodat je direct ziet waar het model aandacht nodig heeft.</p></div>
+          <div class="rv rv-d2"><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="3" y="3" width="30" height="30" rx="9" fill="#DCFCE7"/><path d="M12 18a6 6 0 1 0 2-4.5M12 11v3.5h3.5" stroke="#15803D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Dynamische rapportage</h3><p>Rapportage die meebeweegt met het model, bij elke nieuwe versie opnieuw.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOD -->
+    <section class="section lod" id="lod" aria-labelledby="lodTitle">
+      <div class="wrap">
+        <div class="section-head rv">
+          <span class="eyebrow">GGM LOD Browser</span>
+          <h2 class="section-title" id="lodTitle">Het GGM als<br><span class="grad-violet">web van data.</span></h2>
+          <p class="section-lead">Ontdek het Gemeentelijk Gegevensmodel als Linked Open Data in een intuïtieve webinterface. Blader eenvoudig door domeinen, klassen en relaties &mdash; machine-readable én mensvriendelijk.</p>
+        </div>
+        <div class="graph-wrap rv" aria-hidden="true">
+          <span class="graph-tag">Illustratie</span>
+          <svg class="graph" id="graph" viewBox="0 0 1100 620">
+            <defs><radialGradient id="nodeGrad" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#C4B5FD"/><stop offset=".6" stop-color="#7C3AED"/><stop offset="1" stop-color="#4C1D95"/></radialGradient></defs>
+            <g id="edges"></g><g id="nodes"></g>
+          </svg>
+        </div>
+        <div class="chips rv"><span class="chip">Domeinen</span><span class="chip">Klassen</span><span class="chip">Relaties</span><span class="chip">RDF</span><span class="chip">Linked Open Data</span></div>
+      </div>
+    </section>
+
+    <!-- Flow -->
+    <section class="section" id="flow" aria-labelledby="flowTitle" style="background:var(--bg-elev)">
+      <div class="wrap">
+        <div class="section-head rv">
+          <span class="eyebrow" style="color:var(--fg-muted)">Hoe het werkt</span>
+          <h2 class="section-title" id="flowTitle"><span class="grad-white">Eén bron.</span><br><span class="grad-blue">Drie toepassingen.</span></h2>
+        </div>
+        <div class="flow__track">
+          <div class="flow__node rv">
+            <svg viewBox="0 0 44 44" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="3" stroke="#A1A1AA" stroke-width="1.6" fill="none"/><rect x="24" y="26" width="16" height="12" rx="3" stroke="#A1A1AA" stroke-width="1.6" fill="none"/><path d="M12 18v14h12" stroke="#A1A1AA" stroke-width="1.6" fill="none"/></svg>
+            <h3>Enterprise Architect</h3>
+            <p>Je logische gegevensmodel, zoals het GGM</p>
+          </div>
+          <div class="flow__link" aria-hidden="true"></div>
+          <div class="flow__node flow__node--core rv rv-d1">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93C5FD"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs><rect x="2" y="2" width="9" height="9" rx="2.5" fill="url(#lg2)"/><rect x="13" y="13" width="9" height="9" rx="2.5" fill="url(#lg2)" opacity=".6"/><path d="M11 6.5h4.5a2 2 0 0 1 2 2V13" stroke="url(#lg2)" stroke-width="1.6" fill="none"/></svg>
+            <h3>SchemaLab</h3>
+            <p>Leest het model en zet het om</p>
+          </div>
+          <div class="flow__link" aria-hidden="true"></div>
+          <div class="flow__node rv rv-d2">
+            <h3>Toepassingen</h3>
+            <div class="flow__outs">
+              <span style="color:var(--blue-2)">Schema's &amp; visualisaties</span>
+              <span style="color:var(--green-2)">Kwaliteitsrapport</span>
+              <span style="color:var(--violet-2)">Linked Open Data</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tools -->
+    <section class="section" id="tools" aria-labelledby="toolsTitle">
+      <div class="wrap">
+        <div class="section-head rv">
+          <h2 class="section-title" id="toolsTitle">Kies je tool.</h2>
+          <p class="section-lead">Elke tool opent in een eigen omgeving.</p>
+        </div>
+        <div class="tools">
+          <a class="tool tool--gen rv" href="https://ggm-generator.schemalab.app">
+            <span class="tool__badge">Generator</span>
+            <h3>GGM Schema Generator</h3>
+            <p>Genereer database schema's zoals SQL DDL, dbdiagram.io, PlantUML en RDF/Turtle vanuit je Enterprise Architect-modellen.</p>
+            <div class="tool__meta"><span>Enterprise Architect → DDL</span><span>Visualisaties</span><span>Linked Open Data</span></div>
+            <span class="tool__go">Naar generator <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </a>
+          <a class="tool tool--val rv rv-d1" href="https://ggm-validator.schemalab.app">
+            <span class="tool__badge">Validator</span>
+            <h3>GGM Schema Validator</h3>
+            <p>Controleert structuur, semantiek en consistentie van het GGM-model op basis van expliciete datakwaliteitsregels.</p>
+            <div class="tool__meta"><span>Data Kwaliteit</span><span>Dynamische rapportage</span></div>
+            <span class="tool__go">Naar validator <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </a>
+          <a class="tool tool--lod rv rv-d2" href="https://lod.gemeentelijkgegevensmodel.nl/">
+            <span class="tool__badge">LOD Browser</span>
+            <h3>GGM LOD Browser</h3>
+            <p>Blader door domeinen, klassen en relaties van het Gemeentelijk Gegevensmodel als Linked Open Data.</p>
+            <div class="tool__meta"><span>Linked Open Data</span><span>Intuïtieve navigatie</span><span>RDF</span></div>
+            <span class="tool__go">Naar LOD Browser <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <p>© <span id="year">2026</span> SchemaLab — Tooling voor gegevensmodellen · by <a href="https://github.com/AshkanA">Ashkan Ashkpour</a></p>
+      <p><a href="#top">Terug naar boven ↑</a></p>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    "use strict";
+    var root = document.documentElement;
+    root.classList.add("js");
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
+    function progress(el) {
+      var r = el.getBoundingClientRect();
+      var total = r.height - window.innerHeight;
+      return total <= 0 ? 0 : clamp(-r.top / total, 0, 1);
+    }
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    /* Nav border */
+    var nav = document.getElementById("nav");
+
+    /* Statement: split into words */
+    var st = document.getElementById("statementText");
+    (function split(node) {
+      Array.prototype.slice.call(node.childNodes).forEach(function (n) {
+        if (n.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach(function (part) {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+            var s = document.createElement("span"); s.className = "w"; s.textContent = part; frag.appendChild(s);
+          });
+          n.parentNode.replaceChild(frag, n);
+        } else if (n.nodeType === 1) {
+          if (n.classList.contains("accent")) {
+            n.childNodes.length && split(n);
+            Array.prototype.forEach.call(n.querySelectorAll(".w"), function (w) { w.classList.add("accent"); });
+          } else split(n);
+        }
+      });
+    })(st);
+    var words = st.querySelectorAll(".w");
+
+    /* Generator tabs */
+    var tabs = Array.prototype.slice.call(document.querySelectorAll(".format"));
+    var codes = Array.prototype.slice.call(document.querySelectorAll(".code"));
+    var files = ["persoon.sql", "model.dbml", "model.puml", "model.ttl"];
+    var outs = ["ddl/", "dbdiagram/", "plantuml/", "rdf/"];
+    var fileName = document.getElementById("fileName");
+    var treeOut = document.getElementById("treeOut");
+    var genSec = document.getElementById("generator");
+    var current = -1;
+    function setTab(i, focus) {
+      if (i === current) return;
+      current = i;
+      tabs.forEach(function (t, k) {
+        var on = k === i;
+        t.classList.toggle("is-active", on);
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+        codes[k].classList.toggle("is-active", on);
+      });
+      fileName.textContent = files[i];
+      treeOut.textContent = outs[i];
+      if (focus) tabs[i].focus();
+    }
+    setTab(0);
+    function genScrubActive() { return !reduce && window.matchMedia("(min-width: 981px)").matches; }
+    tabs.forEach(function (t, k) {
+      t.addEventListener("click", function () {
+        if (genScrubActive()) {
+          var top = genSec.getBoundingClientRect().top + window.scrollY;
+          var total = genSec.offsetHeight - window.innerHeight;
+          window.scrollTo({ top: top + total * ((k + .5) / tabs.length), behavior: "smooth" });
+        }
+        setTab(k);
+      });
+      t.addEventListener("keydown", function (e) {
+        var d = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : e.key === "ArrowUp" || e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var n = (current + d + tabs.length) % tabs.length;
+        tabs[n].click(); setTab(n, true);
+      });
+    });
+    /* Mobile / no-scrub: auto-advance while visible */
+    var autoTimer = null;
+    if (!reduce && "IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) {
+        var vis = en[0].isIntersecting;
+        clearInterval(autoTimer);
+        if (vis && !genScrubActive()) autoTimer = setInterval(function () { setTab((current + 1) % tabs.length); }, 3200);
+      }, { threshold: .4 }).observe(genSec);
+    }
+
+    /* Scroll loop */
+    var heroSec = document.getElementById("top");
+    var heroStage = document.getElementById("heroStage");
+    var stSec = document.getElementById("statement");
+    var ticking = false;
+    function frame() {
+      ticking = false;
+      nav.classList.toggle("is-scrolled", window.scrollY > 10);
+      if (reduce) return;
+      heroStage.style.setProperty("--p", progress(heroSec).toFixed(4));
+      var sp = progress(stSec);
+      var lit = Math.round(clamp((sp - .05) / .8, 0, 1) * words.length);
+      for (var i = 0; i < words.length; i++) words[i].classList.toggle("on", i < lit);
+      if (genScrubActive()) {
+        var gp = progress(genSec);
+        var f = gp * tabs.length;
+        setTab(clamp(Math.floor(f), 0, tabs.length - 1));
+        tabs.forEach(function (t, k) { t.querySelector(".bar").style.setProperty("--fill", clamp(f - k, 0, 1).toFixed(3)); });
+      }
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    frame();
+
+    /* Reveal + validator dashboard */
+    var ringVal = document.getElementById("ringVal");
+    var ringNum = document.getElementById("ringNum");
+    function runDash() {
+      var v = parseFloat(ringVal.getAttribute("data-value"));
+      ringVal.style.strokeDashoffset = (534 * (1 - v)).toFixed(1);
+      Array.prototype.forEach.call(document.querySelectorAll(".meter i"), function (m) { m.style.width = m.getAttribute("data-w") + "%"; });
+      var target = Math.round(v * 100);
+      if (reduce) { ringNum.textContent = target; return; }
+      var t0 = performance.now();
+      (function tick(t) {
+        var k = clamp((t - t0) / 1800, 0, 1);
+        ringNum.textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) requestAnimationFrame(tick);
+      })(t0);
+    }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          en.target.classList.add("in");
+          if (en.target.id === "dash") runDash();
+          io.unobserve(en.target);
+        });
+      }, { threshold: .18 });
+      Array.prototype.forEach.call(document.querySelectorAll(".rv"), function (el) { io.observe(el); });
+    } else {
+      Array.prototype.forEach.call(document.querySelectorAll(".rv"), function (el) { el.classList.add("in"); });
+      runDash();
+    }
+
+    /* LOD graph: domains with classes, gently floating; hover highlights neighbours */
+    var NS = "http://www.w3.org/2000/svg";
+    var domains = [
+      { id: "d0", label: "Sociaal Domein", x: 300, y: 200 },
+      { id: "d1", label: "Ruimte", x: 760, y: 170 },
+      { id: "d2", label: "Dienstverlening", x: 540, y: 430 },
+      { id: "d3", label: "Bedrijfsvoering", x: 900, y: 450 },
+      { id: "d4", label: "Kern", x: 170, y: 460 }
+    ];
+    var classes = {
+      d0: ["Client", "Voorziening", "Beschikking", "Indicatie"],
+      d1: ["Perceel", "Pand", "Vergunning", "Bestemmingsplan"],
+      d2: ["Zaak", "Klantcontact", "Document"],
+      d3: ["Medewerker", "Organisatie", "Contract"],
+      d4: ["Persoon", "Adres", "Rechtspersoon"]
+    };
+    var nodes = [], edges = [];
+    domains.forEach(function (d, di) {
+      d.type = "domain"; d.r = 34; d.ph = di * 1.3; nodes.push(d);
+      var cs = classes[d.id];
+      cs.forEach(function (c, ci) {
+        var a = (ci / cs.length) * Math.PI * 2 + di;
+        var n = { id: d.id + "c" + ci, label: c, x: d.x + Math.cos(a) * 120, y: d.y + Math.sin(a) * 95, type: "cls", r: 8, ph: Math.random() * 6 };
+        nodes.push(n); edges.push([d.id, n.id]);
+      });
+    });
+    [["d0", "d2"], ["d1", "d2"], ["d2", "d3"], ["d4", "d0"], ["d4", "d2"], ["d1", "d3"], ["d0c0", "d4c0"], ["d2c0", "d4c0"], ["d1c0", "d4c1"], ["d3c0", "d2c0"]].forEach(function (e) { edges.push(e); });
+    var byId = {}; nodes.forEach(function (n) { n.bx = n.x; n.by = n.y; byId[n.id] = n; });
+    var gE = document.getElementById("edges"), gN = document.getElementById("nodes");
+    edges.forEach(function (e) {
+      var l = document.createElementNS(NS, "line"); l.setAttribute("class", "edge"); gE.appendChild(l); e.el = l;
+    });
+    nodes.forEach(function (n) {
+      var g = document.createElementNS(NS, "g"); g.setAttribute("class", "node " + n.type);
+      if (n.type === "domain") { var p = document.createElementNS(NS, "circle"); p.setAttribute("class", "pulse"); p.setAttribute("r", n.r); p.style.animationDelay = (n.ph % 3) + "s"; g.appendChild(p); }
+      var c = document.createElementNS(NS, "circle"); c.setAttribute("r", n.r); g.appendChild(c);
+      var t = document.createElementNS(NS, "text"); t.textContent = n.label; t.setAttribute("y", n.type === "domain" ? n.r + 22 : n.r + 16); g.appendChild(t);
+      gN.appendChild(g); n.el = g; n.circle = c;
+      g.addEventListener("mouseenter", function () { hot(n.id, true); });
+      g.addEventListener("mouseleave", function () { hot(n.id, false); });
+    });
+    function hot(id, on) {
+      edges.forEach(function (e) { if (e[0] === id || e[1] === id) e.el.classList.toggle("hot", on); });
+      byId[id].circle.setAttribute("r", on ? byId[id].r * 1.25 : byId[id].r);
+    }
+    function place(t) {
+      nodes.forEach(function (n) {
+        var amp = n.type === "domain" ? 8 : 12;
+        n.x = n.bx + Math.sin(t / 1700 + n.ph) * amp;
+        n.y = n.by + Math.cos(t / 2100 + n.ph) * amp;
+        n.el.setAttribute("transform", "translate(" + n.x.toFixed(1) + "," + n.y.toFixed(1) + ")");
+      });
+      edges.forEach(function (e) {
+        var a = byId[e[0]], b = byId[e[1]];
+        e.el.setAttribute("x1", a.x.toFixed(1)); e.el.setAttribute("y1", a.y.toFixed(1));
+        e.el.setAttribute("x2", b.x.toFixed(1)); e.el.setAttribute("y2", b.y.toFixed(1));
+      });
+    }
+    place(0);
+    if (!reduce) {
+      var graphVisible = false;
+      if ("IntersectionObserver" in window) new IntersectionObserver(function (en) { graphVisible = en[0].isIntersecting; }).observe(document.getElementById("graph"));
+      (function loop(t) { if (graphVisible && !document.hidden) place(t); requestAnimationFrame(loop); })(0);
+    }
+  })();
+  </script>
 </body>
 </html>
