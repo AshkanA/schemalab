@@ -109,7 +109,7 @@
     .grad-white { background: linear-gradient(180deg, #FFFFFF 30%, #A1A1AA 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
     /* ---------- Hero (pinned, scroll-scrubbed) ---------- */
-    .hero { position: relative; height: 210vh; }
+    .hero { position: relative; height: 160vh; }
     .hero__stage { position: sticky; top: 0; height: 100vh; min-height: 640px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: calc(var(--nav-h) + 9vh); }
     .hero__glow { position: absolute; inset: auto 50% 0 auto; width: 1400px; height: 900px; transform: translate(50%, 40%); background: radial-gradient(closest-side, rgba(59, 130, 246, .35), rgba(167, 139, 250, .18) 45%, transparent 75%); filter: blur(10px); pointer-events: none; opacity: calc(.6 + var(--p, 0) * .4); }
     .hero__grid-bg { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 64px 64px; mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 20%, transparent 75%); opacity: .5; pointer-events: none; }
@@ -336,10 +336,10 @@
       </a>
       <nav aria-label="Hoofdmenu">
         <ul class="nav__links">
+          <li><a href="#flow">Hoe het werkt</a></li>
           <li><a href="#generator">Generator</a></li>
           <li><a href="#validator">Validator</a></li>
           <li><a href="#lod">LOD Browser</a></li>
-          <li><a href="#flow">Hoe het werkt</a></li>
         </ul>
       </nav>
       <a class="nav__cta" href="#tools">Open de tools</a>
@@ -419,6 +419,70 @@
       </div>
     </section>
 
+    <!-- Flow -->
+    <section class="section" id="flow" aria-labelledby="flowTitle" style="background:var(--bg-elev)">
+      <div class="wrap">
+        <div class="section-head rv">
+          <span class="eyebrow" style="color:var(--fg-muted)">Hoe het werkt</span>
+          <h2 class="section-title" id="flowTitle"><span class="grad-white">Eén bron.</span><br><span class="grad-blue">Drie toepassingen.</span></h2>
+        </div>
+        <div class="flow__track">
+          <div class="flow__node rv">
+            <svg viewBox="0 0 44 44" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="3" stroke="#A1A1AA" stroke-width="1.6" fill="none"/><rect x="24" y="26" width="16" height="12" rx="3" stroke="#A1A1AA" stroke-width="1.6" fill="none"/><path d="M12 18v14h12" stroke="#A1A1AA" stroke-width="1.6" fill="none"/></svg>
+            <h3>Enterprise Architect</h3>
+            <p>Je logische gegevensmodel, zoals het GGM</p>
+          </div>
+          <div class="flow__link" aria-hidden="true"></div>
+          <div class="flow__node flow__node--core rv rv-d1">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93C5FD"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs><rect x="2" y="2" width="9" height="9" rx="2.5" fill="url(#lg2)"/><rect x="13" y="13" width="9" height="9" rx="2.5" fill="url(#lg2)" opacity=".6"/><path d="M11 6.5h4.5a2 2 0 0 1 2 2V13" stroke="url(#lg2)" stroke-width="1.6" fill="none"/></svg>
+            <h3>SchemaLab</h3>
+            <p>Leest het model en zet het om</p>
+          </div>
+          <div class="flow__link" aria-hidden="true"></div>
+          <div class="flow__node rv rv-d2">
+            <h3>Toepassingen</h3>
+            <div class="flow__outs">
+              <span style="color:var(--blue-2)">Schema's &amp; visualisaties</span>
+              <span style="color:var(--green-2)">Kwaliteitsrapport</span>
+              <span style="color:var(--violet-2)">Linked Open Data</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tools -->
+    <section class="section" id="tools" aria-labelledby="toolsTitle">
+      <div class="wrap">
+        <div class="section-head rv">
+          <h2 class="section-title" id="toolsTitle">Kies je tool.</h2>
+          <p class="section-lead">Elke tool opent in een eigen omgeving.</p>
+        </div>
+        <div class="tools">
+          <a class="tool tool--gen rv" href="https://ggm-generator.schemalab.app">
+            <span class="tool__badge">Generator</span>
+            <h3>GGM Schema Generator</h3>
+            <p>Genereer database schema's zoals SQL DDL, dbdiagram.io, PlantUML en RDF/Turtle vanuit je Enterprise Architect-modellen.</p>
+            <div class="tool__meta"><span>Enterprise Architect → DDL</span><span>Visualisaties</span><span>Linked Open Data</span></div>
+            <span class="tool__go">Naar generator <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </a>
+          <a class="tool tool--val rv rv-d1" href="https://ggm-validator.schemalab.app">
+            <span class="tool__badge">Validator</span>
+            <h3>GGM Schema Validator</h3>
+            <p>Controleert structuur, semantiek en consistentie van het GGM-model op basis van expliciete datakwaliteitsregels.</p>
+            <div class="tool__meta"><span>Data Kwaliteit</span><span>Dynamische rapportage</span></div>
+            <span class="tool__go">Naar validator <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </a>
+          <a class="tool tool--lod rv rv-d2" href="https://lod.gemeentelijkgegevensmodel.nl/">
+            <span class="tool__badge">LOD Browser</span>
+            <h3>GGM LOD Browser</h3>
+            <p>Blader door domeinen, klassen en relaties van het Gemeentelijk Gegevensmodel als Linked Open Data.</p>
+            <div class="tool__meta"><span>Linked Open Data</span><span>Intuïtieve navigatie</span><span>RDF</span></div>
+            <span class="tool__go">Naar LOD Browser <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </a>
+        </div>
+      </div>
+    </section>
     <!-- Statement -->
     <section class="statement" id="statement" aria-label="Wat SchemaLab doet">
       <div class="statement__stage">
@@ -573,70 +637,6 @@
       </div>
     </section>
 
-    <!-- Flow -->
-    <section class="section" id="flow" aria-labelledby="flowTitle" style="background:var(--bg-elev)">
-      <div class="wrap">
-        <div class="section-head rv">
-          <span class="eyebrow" style="color:var(--fg-muted)">Hoe het werkt</span>
-          <h2 class="section-title" id="flowTitle"><span class="grad-white">Eén bron.</span><br><span class="grad-blue">Drie toepassingen.</span></h2>
-        </div>
-        <div class="flow__track">
-          <div class="flow__node rv">
-            <svg viewBox="0 0 44 44" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="3" stroke="#A1A1AA" stroke-width="1.6" fill="none"/><rect x="24" y="26" width="16" height="12" rx="3" stroke="#A1A1AA" stroke-width="1.6" fill="none"/><path d="M12 18v14h12" stroke="#A1A1AA" stroke-width="1.6" fill="none"/></svg>
-            <h3>Enterprise Architect</h3>
-            <p>Je logische gegevensmodel, zoals het GGM</p>
-          </div>
-          <div class="flow__link" aria-hidden="true"></div>
-          <div class="flow__node flow__node--core rv rv-d1">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93C5FD"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs><rect x="2" y="2" width="9" height="9" rx="2.5" fill="url(#lg2)"/><rect x="13" y="13" width="9" height="9" rx="2.5" fill="url(#lg2)" opacity=".6"/><path d="M11 6.5h4.5a2 2 0 0 1 2 2V13" stroke="url(#lg2)" stroke-width="1.6" fill="none"/></svg>
-            <h3>SchemaLab</h3>
-            <p>Leest het model en zet het om</p>
-          </div>
-          <div class="flow__link" aria-hidden="true"></div>
-          <div class="flow__node rv rv-d2">
-            <h3>Toepassingen</h3>
-            <div class="flow__outs">
-              <span style="color:var(--blue-2)">Schema's &amp; visualisaties</span>
-              <span style="color:var(--green-2)">Kwaliteitsrapport</span>
-              <span style="color:var(--violet-2)">Linked Open Data</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tools -->
-    <section class="section" id="tools" aria-labelledby="toolsTitle">
-      <div class="wrap">
-        <div class="section-head rv">
-          <h2 class="section-title" id="toolsTitle">Kies je tool.</h2>
-          <p class="section-lead">Elke tool opent in een eigen omgeving.</p>
-        </div>
-        <div class="tools">
-          <a class="tool tool--gen rv" href="https://ggm-generator.schemalab.app">
-            <span class="tool__badge">Generator</span>
-            <h3>GGM Schema Generator</h3>
-            <p>Genereer database schema's zoals SQL DDL, dbdiagram.io, PlantUML en RDF/Turtle vanuit je Enterprise Architect-modellen.</p>
-            <div class="tool__meta"><span>Enterprise Architect → DDL</span><span>Visualisaties</span><span>Linked Open Data</span></div>
-            <span class="tool__go">Naar generator <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
-          </a>
-          <a class="tool tool--val rv rv-d1" href="https://ggm-validator.schemalab.app">
-            <span class="tool__badge">Validator</span>
-            <h3>GGM Schema Validator</h3>
-            <p>Controleert structuur, semantiek en consistentie van het GGM-model op basis van expliciete datakwaliteitsregels.</p>
-            <div class="tool__meta"><span>Data Kwaliteit</span><span>Dynamische rapportage</span></div>
-            <span class="tool__go">Naar validator <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
-          </a>
-          <a class="tool tool--lod rv rv-d2" href="https://lod.gemeentelijkgegevensmodel.nl/">
-            <span class="tool__badge">LOD Browser</span>
-            <h3>GGM LOD Browser</h3>
-            <p>Blader door domeinen, klassen en relaties van het Gemeentelijk Gegevensmodel als Linked Open Data.</p>
-            <div class="tool__meta"><span>Linked Open Data</span><span>Intuïtieve navigatie</span><span>RDF</span></div>
-            <span class="tool__go">Naar LOD Browser <span class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
-          </a>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
